@@ -25,9 +25,9 @@ function boardFull(board: Cell[][]): boolean {
 function makeMove(  board: Cell[][], row: number, col: number, xIsNext: boolean, playerId?: number): MoveResult{
 
 
-    const winner : 'X' | 'O' | null = calculateWinner(board);
-    if (board[row][col].typePlay || winner) {
-        return { newBoard: board, nextPlayer: xIsNext, winner, isDraw: false };
+  
+    if (board[row][col].typePlay ) {
+        return { newBoard: board, nextPlayer: xIsNext, winner : null, isDraw: false };
     }
 
     const newBoard : Cell[][]= structuredClone(board);
