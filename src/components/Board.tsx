@@ -1,8 +1,16 @@
 import { useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { GameTurnProps } from "../types/gameTurn";
+
+export enum CellType {
+  NONE, // nenhuma jogada
+  FIRST,    // jogador 1
+  SECOND,    // jogador 2
+}
 
 type Cell = {
-  typePlay: 'X' | 'O' | null;   // quem marcou a casa
+//  validePlay: boolean; // Jogada Realizada
+  typePlay: CellType;  //'X' | 'O' | null;   // quem marcou a casa
   playerId ?: number;           // quem marcou a casa
   timestamp?: number;          // hora da jogada (opcional)
   isWinning?: boolean;         // se faz parte da linha vencedora
@@ -11,7 +19,7 @@ type Cell = {
 type MoveResult = {
   newBoard: Cell[][];
   nextPlayer: boolean;
-  winner: 'X' | 'O' | null;
+  winner: CellType | null;
   isDraw: boolean;
 };
 
@@ -33,14 +41,14 @@ function makeMove(  board: Cell[][], row: number, col: number, xIsNext: boolean,
     const newBoard : Cell[][]= structuredClone(board);
 
     const newCellPosition : Cell = {
-        typePlay: xIsNext ? 'X' : 'O',
+        typePlay: xIsNext ? CellType.FIRST: CellType.SECOND, // X ou Y
         playerId,
         timestamp: Date.now()
     } 
 
     newBoard[row][col] = newCellPosition
 
-    const winnerAfterMove : 'X' | 'O' | null = calculateWinner(newBoard);
+    const winnerAfterMove : CellType | null = calculateWinner(newBoard);
 
     const isDraw : boolean= !winnerAfterMove && boardFull(newBoard);
 
@@ -53,7 +61,7 @@ function makeMove(  board: Cell[][], row: number, col: number, xIsNext: boolean,
 
 }
 
-function calculateWinner(board: Cell[][]): 'X' | 'O' | null {
+function calculateWinner(board: Cell[][]): CellType | null { // Deve retornar quem ganhou 'X' | 'O' | ou ninguem null
   // Linhas
   for (let i = 0; i < 3; i++) {
     if (
@@ -95,17 +103,17 @@ function calculateWinner(board: Cell[][]): 'X' | 'O' | null {
   return null;
 }
 
-export default function Board(){
+export default function Board({ xIsNext, setXIsNext }: GameTurnProps){
 
   
     let initialBoard = createEmptyBoard(3,3);
 
     const [listBoard, setListBoard] = useState<Cell[][]>(initialBoard);
-    const [xIsNext, setXIsNext] = useState(true);
+
 
     function createEmptyBoard(line : number, column : number,): Cell[][] {
         return Array.from({ length: line }, () =>
-            Array.from({ length: column }, () => ({ typePlay: null }))
+            Array.from({ length: column }, () => ({ typePlay: CellType.NONE}))
         );
     }
 
@@ -137,7 +145,7 @@ export default function Board(){
                                     style={styles.boardCell}
                                     onPress={() => handlePress(rowIndex, colIndex)}
                                     >
-                                    <Text style={styles.boardCellText}>{cell.typePlay}</Text>
+                                    <Text style={styles.boardCellText}>{cell.typePlay == CellType.NONE? null : cell.typePlay === CellType.FIRST ? "X" : "O" }</Text>
                                   
                                 </TouchableOpacity>
                             ))
