@@ -1,35 +1,60 @@
 import { View, Text, StyleSheet } from "react-native";
-import { ControlTurn } from "../types/controlTurn";
+import { GameTurnProps } from "../types/gameTurn";
+import { TypeMatchWinner } from "../enums/TypeMatchWinner";
+import { useMemo } from "react";
 
+export default function PlayersPanel({ controlTurn, setControlTurn }: GameTurnProps) {
 
-export default function PlayersPanel({ player1, player2, xIsNext }: ControlTurn) {
+  const player1Style = useMemo(() => {
+    console.log("1" + controlTurn.matchWinner)
+    if (controlTurn.matchWinner === TypeMatchWinner.NONE) {
+      return controlTurn.xIsNext ? styles.activePlayer : undefined;
+    } else if (
+      controlTurn.matchWinner === TypeMatchWinner.FIRST ||
+      controlTurn.matchWinner === TypeMatchWinner.DRAW
+    ) {
+      return styles.winnerPlayer;
+    }
+    return undefined;
+  }, [controlTurn]);
+
+    const player2Style = useMemo(() => {
+    console.log("2" + controlTurn.matchWinner)
+    if (controlTurn.matchWinner === TypeMatchWinner.NONE) {
+      return !controlTurn.xIsNext ? styles.activePlayer : undefined;
+    } else if (
+      controlTurn.matchWinner === TypeMatchWinner.SECOND ||
+      controlTurn.matchWinner === TypeMatchWinner.DRAW
+    ) {
+      return styles.winnerPlayer;
+    }
+    return undefined;
+  }, [controlTurn]);
+
   return (
     <View style={styles.container}>
-      <View
-        style={[
-          styles.playerBox,
-          xIsNext && styles.activePlayer,
-        ]}
-      >
-        <Text style={styles.playerName}>{player1.name}</Text>
-        <Text style={styles.symbol}>X</Text>
-        {xIsNext && (
-          <Text style={styles.turnText}>Sua vez!</Text>
-        )}
-      </View>
+      {controlTurn ? (
+        <>
+          <View style={[styles.playerBox, player1Style]}>
+            <Text style={styles.playerName}>{controlTurn.player1.name}</Text>
+            <Text style={styles.symbol}>X</Text>
+            {controlTurn.xIsNext && controlTurn.matchWinner === TypeMatchWinner.NONE && (
+              <Text style={styles.turnText}>Sua vez!</Text>
+            )}
+          </View>
 
-      <View
-        style={[
-          styles.playerBox,
-          !xIsNext && styles.activePlayer,
-        ]}
-      >
-        <Text style={styles.playerName}>{player2.name}</Text>
-        <Text style={styles.symbol}>0</Text>
-        {!xIsNext && (
-          <Text style={styles.turnText}>Sua vez!</Text>
-        )}
-      </View>
+
+          <View style={[styles.playerBox, player2Style]}>
+            <Text style={styles.playerName}>{controlTurn.player2.name}</Text>
+            <Text style={styles.symbol}>O</Text>
+            {!controlTurn.xIsNext && (
+              <Text style={styles.turnText}>Sua vez!</Text>
+            )}
+          </View>
+        </>
+      ) : (
+        <Text>Carregando jogadores...</Text>
+      )}
     </View>
   );
 }
@@ -51,6 +76,9 @@ const styles = StyleSheet.create({
   },
   activePlayer: {
     backgroundColor: "#4CAF50",
+  },
+  winnerPlayer: {
+    backgroundColor: "#d69813ff",
   },
   playerName: {
     fontSize: 18,

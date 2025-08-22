@@ -3,22 +3,16 @@ import { StatusBar } from 'expo-status-bar';
 import Board from '../components/Board';
 import PlayersPanel from '../components/PlayersPanel';
 import { useState } from 'react';
+import { TypeMatchWinner } from '../enums/TypeMatchWinner';
+import { ControlTurn } from '../types/controlTurn';
 export default function PlayGameScreen(){
 
-    const [xIsNext, setXIsNext] = useState(true);
-
-     let player1 = {
-        id: "111",
-        name: "test",
-      
-    };   
-
-       let player2 = {
-        id: "222",
-        name: "aaaa",
-    
-    }; 
- 
+   const [controlTurn, setControlTurn] = useState<ControlTurn>({
+    player1: { id: "1", name: "Jogador 1" },
+    player2: { id: "2", name: "Jogador 2" },
+    xIsNext: true, // X começa jogando
+    matchWinner: TypeMatchWinner.NONE, // supondo que você tenha None no enum
+    });
 
     return (
         <View style={styles.container}>           
@@ -28,11 +22,9 @@ export default function PlayGameScreen(){
             </Text>
 
             <PlayersPanel
-                player1={player1}
-                player2={player2}
-                xIsNext={xIsNext}
+              controlTurn={controlTurn} setControlTurn={setControlTurn}
             />
-            <Board setXIsNext={setXIsNext} xIsNext={xIsNext}></Board>
+            <Board controlTurn={controlTurn} setControlTurn={setControlTurn} ></Board>
 
             <StatusBar style="auto" />
         </View>

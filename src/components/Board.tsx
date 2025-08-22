@@ -1,12 +1,9 @@
 import { useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { GameTurnProps } from "../types/gameTurn";
+import { CellType } from "../enums/CellType";
+import { TypeMatchWinner } from "../enums/TypeMatchWinner";
 
-export enum CellType {
-  NONE, // nenhuma jogada
-  FIRST,    // jogador 1
-  SECOND,    // jogador 2
-}
 
 type Cell = {
 //  validePlay: boolean; // Jogada Realizada
@@ -48,8 +45,10 @@ function makeMove(  board: Cell[][], row: number, col: number, xIsNext: boolean,
 
     newBoard[row][col] = newCellPosition
 
-    const winnerAfterMove : CellType | null = calculateWinner(newBoard);
+    // Valida e indica se o player 1 ou 2 fez a combinacao vencedora, se nao é null (sem combinacao vencedora)
+    const winnerAfterMove : CellType | null = calculateWinner(newBoard); 
 
+    // Indicara se ocorreu enpate técnico
     const isDraw : boolean= !winnerAfterMove && boardFull(newBoard);
 
     return {
@@ -103,7 +102,7 @@ function calculateWinner(board: Cell[][]): CellType | null { // Deve retornar qu
   return null;
 }
 
-export default function Board({ xIsNext, setXIsNext }: GameTurnProps){
+export default function Board({ controlTurn, setControlTurn }: GameTurnProps){
 
   
     let initialBoard = createEmptyBoard(3,3);
@@ -118,17 +117,39 @@ export default function Board({ xIsNext, setXIsNext }: GameTurnProps){
     }
 
     function handlePress(row: number, col: number, playerId?: number) {
-        const { newBoard, nextPlayer, winner, isDraw } = makeMove(listBoard, row, col, xIsNext, playerId);
+        const { newBoard, nextPlayer, winner, isDraw } = makeMove(listBoard, row, col, controlTurn.xIsNext, playerId);
 
         setListBoard(newBoard);
-        setXIsNext(nextPlayer);
+        //setXIsNext(nextPlayer);
+        setControlTurn(prev => ({
+          ...prev,
+          xIsNext: nextPlayer, // alterna jogador
+        }));
 
         if (winner) {
-            Alert.alert('Fim de jogo', `O vencedor é ${winner}`);
+            console.log('Fim de jogo', `O vencedor é ${winner}`);
+            if(CellType.FIRST == winner){
+              setControlTurn(prev => ({
+                ...prev,
+                matchWinner : TypeMatchWinner.FIRST
+              }));
+            }
+            else{
+              setControlTurn(prev => ({
+                ...prev,
+                matchWinner : TypeMatchWinner.SECOND
+              }));
+            }
             console.log("Fim de jogo")
+            
         } else if (isDraw) {
+            setControlTurn(prev => ({
+            ...prev,
+            matchWinner : TypeMatchWinner.DRAW
+          }));
+      
             Alert.alert('Fim de jogo', 'Empate!');
-              console.log("Fim de jogo")
+            console.log("Fim de jogo")
         }
     }
 
