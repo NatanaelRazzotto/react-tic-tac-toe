@@ -31,6 +31,10 @@ export default function PlayersPanel({ controlTurn, setControlTurn }: GameTurnPr
     return undefined;
   }, [controlTurn]);
 
+  // const player1Status = useMemo(() => {
+  //   controlTurn.xIsNext && controlTurn.matchWinner === TypeMatchWinner.NONE
+  // }, [controlTurn]);
+
   return (
     <View style={styles.container}>
       {controlTurn ? (

@@ -3,6 +3,7 @@ import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { GameTurnProps } from "../types/gameTurn";
 import { CellType } from "../enums/CellType";
 import { TypeMatchWinner } from "../enums/TypeMatchWinner";
+import GameModal from "./GameModal";
 
 
 type Cell = {
@@ -108,6 +109,7 @@ export default function Board({ controlTurn, setControlTurn }: GameTurnProps){
     let initialBoard = createEmptyBoard(3,3);
 
     const [listBoard, setListBoard] = useState<Cell[][]>(initialBoard);
+    const [modalVisible, setModalVisible] = useState(false);
 
 
     function createEmptyBoard(line : number, column : number,): Cell[][] {
@@ -117,6 +119,12 @@ export default function Board({ controlTurn, setControlTurn }: GameTurnProps){
     }
 
     function handlePress(row: number, col: number, playerId?: number) {
+        if(controlTurn.matchWinner != TypeMatchWinner.NONE)
+        {
+            console.log("Nao pode preencher")
+             Alert.alert('Fim de jogo', 'Empate!');
+            return;
+        }
         const { newBoard, nextPlayer, winner, isDraw } = makeMove(listBoard, row, col, controlTurn.xIsNext, playerId);
 
         setListBoard(newBoard);
@@ -128,13 +136,14 @@ export default function Board({ controlTurn, setControlTurn }: GameTurnProps){
 
         if (winner) {
             console.log('Fim de jogo', `O vencedor é ${winner}`);
+            setModalVisible(true);
             if(CellType.FIRST == winner){
               setControlTurn(prev => ({
                 ...prev,
                 matchWinner : TypeMatchWinner.FIRST
               }));
             }
-            else{
+            else{            
               setControlTurn(prev => ({
                 ...prev,
                 matchWinner : TypeMatchWinner.SECOND
@@ -143,10 +152,11 @@ export default function Board({ controlTurn, setControlTurn }: GameTurnProps){
             console.log("Fim de jogo")
             
         } else if (isDraw) {
+            setModalVisible(true);
             setControlTurn(prev => ({
-            ...prev,
-            matchWinner : TypeMatchWinner.DRAW
-          }));
+              ...prev,
+              matchWinner : TypeMatchWinner.DRAW
+            }));
       
             Alert.alert('Fim de jogo', 'Empate!');
             console.log("Fim de jogo")
@@ -173,8 +183,14 @@ export default function Board({ controlTurn, setControlTurn }: GameTurnProps){
                         }
                     </View>
                 ))
-            }
 
+                
+            }
+          <GameModal
+            visible={modalVisible}    
+            onClose={() => setModalVisible(false)}
+            controlTurn={controlTurn}
+          />
         </View>
     )
 
