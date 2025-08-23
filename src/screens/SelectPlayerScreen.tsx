@@ -1,31 +1,56 @@
-import { useState } from "react";
+import { useState , useContext, use} from "react";
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native";
+import { PlayerContext } from "../contexts/playerContext";
+import { Player } from "../models/player";
+import { CellType } from "../enums/CellType";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { PlayStackParamList } from "../types/playStackParamList";
 
-const mockUsers = [
-  { id: 1, name: "Alice" },
-  { id: 2, name: "Bob" },
-  { id: 3, name: "Carlos" },
-  { id: 4, name: "Diana" },
-  { id: 5, name: "Evelyn" },
+const mockUsers : Array <Player>= [
+  { id: "1", name: "Alice" },
+  { id: "2", name: "Bob" },
+  { id: "3", name: "Carlos" },
+
 ];
 
-export default function SelectPlayerScreen({ navigation }: any) {
+type PropsRoute = NativeStackScreenProps<PlayStackParamList, "SelectPlayer">;
+
+export default function SelectPlayerScreen({ route, navigation }: PropsRoute) {
+
+  const { typePlayer } = route.params;
+
   const [search, setSearch] = useState("");
   const [selectedUser, setSelectedUser] = useState<any>(null);
 
-  const filteredUsers = mockUsers.filter((user) =>
-    user.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const playerContext  = useContext(PlayerContext);
 
-  function handleSelect(user: any) {
+  let filteredUsers : Player[] = mockUsers
+    .filter((user) =>
+      user.name.toLowerCase().includes(search.toLowerCase())
+    )
+
+  if (playerContext?.controlTurn.player1){
+    filteredUsers = filteredUsers.filter(user =>
+      user.id !== playerContext?.controlTurn.player1?.id
+    );
+  }
+
+  function handleSelect(user: Player) {
+    console.log(user)  
     setSelectedUser(user);
   }
 
   function handleConfirm() {
     if (!selectedUser) return;
-    navigation.navigate("GameInitial", { player: selectedUser });
+    if (typePlayer == CellType.FIRST){
+      playerContext?.setInitializeMatch(selectedUser)
+    }
+    else if (typePlayer == CellType.SECOND){
+      playerContext?.setSecondaryPlayer(selectedUser)
+    }
+    navigation.navigate("GameInitial");
   }
 
   return (

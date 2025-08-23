@@ -1,12 +1,20 @@
 // GameModal.tsx
-import React, { useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { ManagerGameModalProps } from '../types/managerGameModalProps';
 import { TypeMatchWinner } from '../enums/TypeMatchWinner';
+import { PlayerContext } from '../contexts/playerContext';
 
 
-export default function GameModal({ visible, onClose ,controlTurn}: ManagerGameModalProps) {
+export default function GameModal({ visible, onClose}: ManagerGameModalProps) {
   
+    const playerContext = useContext(PlayerContext);
+  
+    if (!playerContext) {
+      return <Text>Contexto não disponível</Text>;
+    }
+  
+    const { controlTurn } = playerContext;
   
     const definedTitle = useMemo(() => {
    
@@ -32,12 +40,12 @@ export default function GameModal({ visible, onClose ,controlTurn}: ManagerGameM
       else if (
         controlTurn.matchWinner === TypeMatchWinner.FIRST
       ) {
-        return "Jogador " + controlTurn.player1.name + ", GANHOU! ";
+        return "Jogador " + controlTurn.player1?.name + ", GANHOU! ";
       }
       else if (
         controlTurn.matchWinner === TypeMatchWinner.SECOND
       ) { 
-        return "Jogador " + controlTurn.player2.name + ", GANHOU! ";
+        return "Jogador " + controlTurn.player2?.name + ", GANHOU! ";
       }
       return ""
     }, [controlTurn]);

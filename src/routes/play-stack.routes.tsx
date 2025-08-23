@@ -3,17 +3,16 @@ import { createStackNavigator } from '@react-navigation/stack';
 import InitialGameMatchScreen from '../screens/InitialGameMatchScreen';
 import PlayGameScreen from '../screens/PlayGameScreen';
 import SelectPlayerScreen from '../screens/SelectPlayerScreen';
+import { PlayStackParamList } from '../types/playStackParamList';
 
-
-const { Screen, Navigator }  = createStackNavigator();
+const Stack = createStackNavigator<PlayStackParamList>();
 
 export function PlayStackRoutes() {
   return (
-    <Navigator screenOptions={{ headerShown: false }}>
-   
-        <Screen name="GameInitial" component={InitialGameMatchScreen} />
-        <Screen name="GamePlay" component={PlayGameScreen} />
-        <Screen name='SelectPlayer' component={SelectPlayerScreen}></Screen>
-    </Navigator>
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="GameInitial" component={InitialGameMatchScreen} />
+      <Stack.Screen name="GamePlay" component={PlayGameScreen} />
+      <Stack.Screen name="SelectPlayer" component={SelectPlayerScreen} />
+    </Stack.Navigator>
   );
 }

@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { GameTurnProps } from "../types/gameTurn";
 import { CellType } from "../enums/CellType";
 import { TypeMatchWinner } from "../enums/TypeMatchWinner";
 import GameModal from "./GameModal";
+import { PlayerContext } from "../contexts/playerContext";
 
 
 type Cell = {
@@ -103,7 +104,15 @@ function calculateWinner(board: Cell[][]): CellType | null { // Deve retornar qu
   return null;
 }
 
-export default function Board({ controlTurn, setControlTurn }: GameTurnProps){
+export default function Board(){
+
+    const playerContext = useContext(PlayerContext);
+  
+    if (!playerContext) {
+      return <Text>Contexto não disponível</Text>;
+    }
+  
+    const { controlTurn } = playerContext;
 
   
     let initialBoard = createEmptyBoard(3,3);
@@ -129,34 +138,41 @@ export default function Board({ controlTurn, setControlTurn }: GameTurnProps){
 
         setListBoard(newBoard);
         //setXIsNext(nextPlayer);
-        setControlTurn(prev => ({
-          ...prev,
-          xIsNext: nextPlayer, // alterna jogador
-        }));
+
+        playerContext?.setControlMatch(nextPlayer)
+        
+        // setControlTurn(prev => ({
+        //   ...prev,
+        //   xIsNext: nextPlayer, // alterna jogador
+        // }));
 
         if (winner) {
             console.log('Fim de jogo', `O vencedor é ${winner}`);
             setModalVisible(true);
             if(CellType.FIRST == winner){
-              setControlTurn(prev => ({
-                ...prev,
-                matchWinner : TypeMatchWinner.FIRST
-              }));
+              playerContext?.setControlWinnerMatch(TypeMatchWinner.FIRST)
+              // setControlTurn(prev => ({
+              //   ...prev,
+              //   matchWinner : TypeMatchWinner.FIRST
+              // }));
             }
-            else{            
-              setControlTurn(prev => ({
-                ...prev,
-                matchWinner : TypeMatchWinner.SECOND
-              }));
+            else{       
+              playerContext?.setControlWinnerMatch(TypeMatchWinner.FIRST)     
+              // setControlTurn(prev => ({
+              //   ...prev,
+              //   matchWinner : TypeMatchWinner.FIRST
+              // }));
             }
             console.log("Fim de jogo")
             
         } else if (isDraw) {
+          
             setModalVisible(true);
-            setControlTurn(prev => ({
-              ...prev,
-              matchWinner : TypeMatchWinner.DRAW
-            }));
+              playerContext?.setControlWinnerMatch(TypeMatchWinner.DRAW)
+            // setControlTurn(prev => ({
+            //   ...prev,
+            //   matchWinner : TypeMatchWinner.DRAW
+            // }));
       
             Alert.alert('Fim de jogo', 'Empate!');
             console.log("Fim de jogo")
@@ -189,7 +205,6 @@ export default function Board({ controlTurn, setControlTurn }: GameTurnProps){
           <GameModal
             visible={modalVisible}    
             onClose={() => setModalVisible(false)}
-            controlTurn={controlTurn}
           />
         </View>
     )

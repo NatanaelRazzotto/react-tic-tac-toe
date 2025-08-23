@@ -1,12 +1,21 @@
 import { View, Text, StyleSheet } from "react-native";
 import { GameTurnProps } from "../types/gameTurn";
 import { TypeMatchWinner } from "../enums/TypeMatchWinner";
-import { useMemo } from "react";
+import { useContext, useMemo } from "react";
+import { PlayerContext } from "../contexts/playerContext";
 
-export default function PlayersPanel({ controlTurn, setControlTurn }: GameTurnProps) {
+export default function PlayersPanel() {
+  const playerContext = useContext(PlayerContext);
+
+  if (!playerContext) {
+    return <Text>Contexto não disponível</Text>;
+  }
+
+  const { controlTurn } = playerContext;
 
   const player1Style = useMemo(() => {
-    console.log("1" + controlTurn.matchWinner)
+    if (!controlTurn) return undefined;
+
     if (controlTurn.matchWinner === TypeMatchWinner.NONE) {
       return controlTurn.xIsNext ? styles.activePlayer : undefined;
     } else if (
@@ -18,8 +27,9 @@ export default function PlayersPanel({ controlTurn, setControlTurn }: GameTurnPr
     return undefined;
   }, [controlTurn]);
 
-    const player2Style = useMemo(() => {
-    console.log("2" + controlTurn.matchWinner)
+  const player2Style = useMemo(() => {
+    if (!controlTurn) return undefined;
+
     if (controlTurn.matchWinner === TypeMatchWinner.NONE) {
       return !controlTurn.xIsNext ? styles.activePlayer : undefined;
     } else if (
@@ -31,29 +41,26 @@ export default function PlayersPanel({ controlTurn, setControlTurn }: GameTurnPr
     return undefined;
   }, [controlTurn]);
 
-  // const player1Status = useMemo(() => {
-  //   controlTurn.xIsNext && controlTurn.matchWinner === TypeMatchWinner.NONE
-  // }, [controlTurn]);
-
   return (
     <View style={styles.container}>
-      {controlTurn ? (
+      {controlTurn.player1 && controlTurn.player2 ? (
         <>
           <View style={[styles.playerBox, player1Style]}>
             <Text style={styles.playerName}>{controlTurn.player1.name}</Text>
             <Text style={styles.symbol}>X</Text>
-            {controlTurn.xIsNext && controlTurn.matchWinner === TypeMatchWinner.NONE && (
-              <Text style={styles.turnText}>Sua vez!</Text>
-            )}
+            {controlTurn.xIsNext &&
+              controlTurn.matchWinner === TypeMatchWinner.NONE && (
+                <Text style={styles.turnText}>Sua vez!</Text>
+              )}
           </View>
-
 
           <View style={[styles.playerBox, player2Style]}>
             <Text style={styles.playerName}>{controlTurn.player2.name}</Text>
             <Text style={styles.symbol}>O</Text>
-            {!controlTurn.xIsNext && (
-              <Text style={styles.turnText}>Sua vez!</Text>
-            )}
+            {!controlTurn.xIsNext &&
+              controlTurn.matchWinner === TypeMatchWinner.NONE && (
+                <Text style={styles.turnText}>Sua vez!</Text>
+              )}
           </View>
         </>
       ) : (
@@ -62,6 +69,7 @@ export default function PlayersPanel({ controlTurn, setControlTurn }: GameTurnPr
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {

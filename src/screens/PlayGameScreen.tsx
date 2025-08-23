@@ -2,17 +2,14 @@ import { View, Text, TouchableOpacity, StyleSheet, Alert, Button } from 'react-n
 import { StatusBar } from 'expo-status-bar';
 import Board from '../components/Board';
 import PlayersPanel from '../components/PlayersPanel';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { TypeMatchWinner } from '../enums/TypeMatchWinner';
 import { ControlTurn } from '../types/controlTurn';
+import { PlayerContext } from '../contexts/playerContext';
 export default function PlayGameScreen(){
 
-   const [controlTurn, setControlTurn] = useState<ControlTurn>({
-    player1: { id: "1", name: "Jogador 1" },
-    player2: { id: "2", name: "Jogador 2" },
-    xIsNext: true, // X começa jogando
-    matchWinner: TypeMatchWinner.NONE, // supondo que você tenha None no enum
-    });
+    
+
 
     return (
         <View style={styles.container}>           
@@ -21,10 +18,8 @@ export default function PlayGameScreen(){
                 Play works!!!
             </Text>
 
-            <PlayersPanel
-              controlTurn={controlTurn} setControlTurn={setControlTurn}
-            />
-            <Board controlTurn={controlTurn} setControlTurn={setControlTurn} ></Board>
+            <PlayersPanel/>
+            <Board ></Board>
 
             <StatusBar style="auto" />
         </View>

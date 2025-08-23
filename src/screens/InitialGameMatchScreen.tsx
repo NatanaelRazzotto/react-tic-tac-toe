@@ -2,20 +2,37 @@ import { View, Text, TouchableOpacity, StyleSheet, Alert, Button } from 'react-n
 import { StatusBar } from 'expo-status-bar';
 import Board from '../components/Board';
 import { useNavigation } from '@react-navigation/native';
-export default function InitialGameMatchScreen({navigation } : any){
+import { useContext } from 'react';
+import { PlayerContext } from '../contexts/playerContext';
+import { CellType } from '../enums/CellType';
+
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { PlayStackParamList } from '../types/playStackParamList';
+
+type PropsRoute = NativeStackScreenProps<PlayStackParamList, "GameInitial">;
+
+export default function InitialGameMatchScreen({navigation } : PropsRoute){
+
+    const playerContext = useContext(PlayerContext);
+  
+    if (!playerContext) {
+      return <Text>Contexto não disponível</Text>;
+    }
+  
+    const { controlTurn } = playerContext;
 
     function navToPlayGame(){
         navigation.navigate('GamePlay')
     } 
 
-    function handleSelectPlayer(player: number) {
+    function handleSelectPlayer(playerSelect: CellType) {
         // Aqui você pode enviar para a próxima tela qual player foi escolhido
-        navigation.navigate('SelectPlayer', { player });
+        navigation.navigate("SelectPlayer", { typePlayer: playerSelect });
     }
 
     function handleSelectStart(player: number) {
         // Aqui você pode enviar para a próxima tela qual player foi escolhido
-        navigation.navigate('GamePlay', { player });
+        navigation.navigate('GamePlay');
     }
 
     return (
@@ -25,21 +42,22 @@ export default function InitialGameMatchScreen({navigation } : any){
 
         <TouchableOpacity 
             style={[styles.button, { backgroundColor: '#4CAF50' }]} 
-            onPress={() => handleSelectPlayer(1)}
+            onPress={() => handleSelectPlayer(CellType.FIRST)}
         >
-            <Text style={styles.buttonText}>Jogador 1 (X)</Text>
+            <Text style={styles.buttonText}>{controlTurn.player1 ? controlTurn.player1.name : "Selecione o Jogador"}  (X)</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
             style={[styles.button, { backgroundColor: '#2196F3' }]} 
-            onPress={() => handleSelectPlayer(2)}
+            onPress={() => handleSelectPlayer(CellType.SECOND)}
         >
-            <Text style={styles.buttonText}>Jogador 2 (O)</Text>
+            <Text style={styles.buttonText}>{controlTurn.player2 ? controlTurn.player2.name : "Selecione o Jogador"} (O)</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
-            style={[styles.button, { backgroundColor: '#2196F3' }]} 
+            style={[styles.button,  { backgroundColor: controlTurn.player1 && controlTurn.player2  ?  '#2196F3' : '#ccc' }]} 
             onPress={() => handleSelectStart(2)}
+            disabled={controlTurn.player1 && controlTurn.player2 ? false : true} 
         >
             <Text style={styles.buttonText}>INICIAR</Text>
         </TouchableOpacity>
