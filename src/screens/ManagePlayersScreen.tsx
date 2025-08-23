@@ -24,32 +24,50 @@ export default function ManagePlayersScreen() {
 
   const [name, setName] = useState("");
   const [symbol, setSymbol] = useState<"X" | "O">("X");
+  const [editingPlayerId, setEditingPlayerId] = useState<number | null>(null);
 
-  function handleAddPlayer() {
+  function handleAddOrEditPlayer() {
     if (!name.trim()) {
       Alert.alert("Erro", "Digite o nome do jogador.");
       return;
     }
 
-    const newPlayer: Player = {
-      id: Date.now(),
-      name,
-      symbol,
-    };
+    if (editingPlayerId !== null) {
+      // Editando
+      setPlayers((prev) =>
+        prev.map((p) =>
+          p.id === editingPlayerId ? { ...p, name, symbol } : p
+        )
+      );
+      setEditingPlayerId(null);
+    } else {
+      // Novo jogador
+      const newPlayer: Player = {
+        id: Date.now(),
+        name,
+        symbol,
+      };
+      setPlayers((prev) => [...prev, newPlayer]);
+    }
 
-    setPlayers((prev) => [...prev, newPlayer]);
     setName("");
+    setSymbol("X");
   }
 
   function handleDeletePlayer(id: number) {
     setPlayers((prev) => prev.filter((p) => p.id !== id));
   }
 
+  function handleEditPlayer(player: Player) {
+    setEditingPlayerId(player.id);
+    setName(player.name);
+    setSymbol(player.symbol);
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Gerenciar Jogadores</Text>
 
-      {/* Formulário de cadastro */}
       <TextInput
         style={styles.input}
         placeholder="Nome do jogador"
@@ -67,6 +85,7 @@ export default function ManagePlayersScreen() {
         >
           <Text style={styles.symbolText}>X</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={[
             styles.symbolButton,
@@ -78,11 +97,12 @@ export default function ManagePlayersScreen() {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.addButton} onPress={handleAddPlayer}>
-        <Text style={styles.addButtonText}>Cadastrar Jogador</Text>
+      <TouchableOpacity style={styles.addButton} onPress={handleAddOrEditPlayer}>
+        <Text style={styles.addButtonText}>
+          {editingPlayerId !== null ? "Salvar Alterações" : "Cadastrar Jogador"}
+        </Text>
       </TouchableOpacity>
 
-      {/* Lista de jogadores */}
       <FlatList
         style={{ marginTop: 20 }}
         data={players}
@@ -92,12 +112,21 @@ export default function ManagePlayersScreen() {
             <Text style={styles.playerName}>
               {item.name} ({item.symbol})
             </Text>
-            <TouchableOpacity
-              style={styles.deleteButton}
-              onPress={() => handleDeletePlayer(item.id)}
-            >
-              <Text style={styles.deleteText}>Excluir</Text>
-            </TouchableOpacity>
+            <View style={{ flexDirection: "row" }}>
+              <TouchableOpacity
+                style={[styles.deleteButton, { backgroundColor: "#4CAF50", marginRight: 5 }]}
+                onPress={() => handleEditPlayer(item)}
+              >
+                <Text style={styles.deleteText}>Editar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={() => handleDeletePlayer(item.id)}
+              >
+                <Text style={styles.deleteText}>Excluir</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
       />
@@ -166,6 +195,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "#fff",
     marginBottom: 8,
+    alignItems: "center",
   },
   playerName: {
     fontSize: 16,
