@@ -13,15 +13,16 @@ export default function GameModal({ visible, onClose}: ManagerGameModalProps) {
     if (!playerContext) {
       return <Text>Contexto não disponível</Text>;
     }
-  
+    
     const { controlTurn } = playerContext;
+    const { gameMatch } = controlTurn;
   
     const definedTitle = useMemo(() => {
    
-      if (controlTurn.gameMatch.status === MatchStatus.InProgress) {
+      if (gameMatch?.status === MatchStatus.InProgress) {
         return "SEM DEFINIÇÃO!";
       } else if (
-        controlTurn.gameMatch.status === MatchStatus.Draw
+        gameMatch?.status === MatchStatus.Draw
       ) {
         return "EMPATE!";
       }
@@ -33,19 +34,19 @@ export default function GameModal({ visible, onClose}: ManagerGameModalProps) {
     const definedDescricao = useMemo(() => {
    
       if (
-        controlTurn.gameMatch.status === MatchStatus.Draw
+        gameMatch?.status === MatchStatus.Draw
       ) {
         return "Nenhum ganhador!";
       }
       else if (
-        controlTurn.gameMatch.status === MatchStatus.FirstPlayerWon
+        gameMatch?.status === MatchStatus.FirstPlayerWon
       ) {
-        return "Jogador " + controlTurn.gameMatch.firstPlayer?.name + ", GANHOU! ";
+        return "Jogador " + gameMatch?.firstPlayer?.name + ", GANHOU! ";
       }
       else if (
-        controlTurn.gameMatch.status === MatchStatus.SecondPlayerWon
+        gameMatch?.status === MatchStatus.SecondPlayerWon
       ) { 
-        return "Jogador " + controlTurn.gameMatch.secondPlayer?.name + ", GANHOU! ";
+        return "Jogador " + gameMatch?.secondPlayer?.name + ", GANHOU! ";
       }
       return ""
     }, [controlTurn]);

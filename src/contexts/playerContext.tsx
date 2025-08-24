@@ -87,6 +87,9 @@ export default function PlayerContextProvider({children } : any){
             return {
                 ...prev,
                   status: winnerPlayer, 
+                  gameMatch: prev.gameMatch
+                    ? { ...prev.gameMatch, status: winnerPlayer }
+                    : { id: undefined, firstPlayer: undefined, secondPlayer: undefined, status: winnerPlayer }        
             
             };
         });

@@ -5,13 +5,17 @@ import { CellType } from "../enums/CellType";
 import { MatchStatus } from "../enums/MatchStatus";
 import GameModal from "./GameModal";
 import { PlayerContext } from "../contexts/playerContext";
-import { getUsers } from "../api/userService";
+import { createGameMatch, createMove, getUsers } from "../api/userService";
+import { CreateGameMatchDto } from "../models/CreateGameMatchDto";
+import { CreateMoveDTO } from "../models/createMoveDTO";
+import { GameMatch } from "../models/gameMatch";
+import { User } from "../models/user";
 
 
 type Cell = {
 //  validePlay: boolean; // Jogada Realizada
   typePlay: CellType;  //'X' | 'O' | null;   // quem marcou a casa
-  playerId ?: number;           // quem marcou a casa
+  playerId ?: string;           // quem marcou a casa
   timestamp?: number;          // hora da jogada (opcional)
   isWinning?: boolean;         // se faz parte da linha vencedora
 };
@@ -23,6 +27,83 @@ type MoveResult = {
   isDraw: boolean;
 };
 
+
+export default function Board(){
+
+    const playerContext = useContext(PlayerContext);
+  
+    if (!playerContext) {
+      return <Text>Contexto não disponível</Text>;
+    }
+  
+    const { controlTurn } = playerContext;
+    const { gameMatch } = controlTurn;
+  
+    let initialBoard = createEmptyBoard(3,3);
+
+    const [listBoard, setListBoard] = useState<Cell[][]>(initialBoard);
+    const [modalVisible, setModalVisible] = useState(false);
+
+
+    function createEmptyBoard(line : number, column : number,): Cell[][] {
+        return Array.from({ length: line }, () =>
+            Array.from({ length: column }, () => ({ typePlay: CellType.NoneType}))
+        );
+    }
+
+    function handlePress(row: number, col: number, playerId?: number) {
+        if(gameMatch?.status != MatchStatus.InProgress)
+        {
+            console.log("Nao pode preencher")
+             Alert.alert('Fim de jogo', 'Empate!');
+            return;
+        }
+        const { newBoard, nextPlayer, winner, isDraw } = makeMove(listBoard, row, col, controlTurn.xIsNext, playerId);
+
+        setListBoard(newBoard);
+        //setXIsNext(nextPlayer);
+
+        playerContext?.setControlMatch(nextPlayer)
+        
+        // setControlTurn(prev => ({
+        //   ...prev,
+        //   xIsNext: nextPlayer, // alterna jogador
+        // }));
+
+        if (winner) {
+            console.log('Fim de jogo', `O vencedor é ${winner}`);
+            setModalVisible(true);
+            if(CellType.FirstType == winner){
+              playerContext?.setControlWinnerMatch(MatchStatus.FirstPlayerWon)
+              // setControlTurn(prev => ({
+              //   ...prev,
+              //   matchWinner : TypeMatchWinner.FIRST
+              // }));
+            }
+            else{       
+              playerContext?.setControlWinnerMatch(MatchStatus.SecondPlayerWon)     
+              // setControlTurn(prev => ({
+              //   ...prev,
+              //   matchWinner : TypeMatchWinner.FIRST
+              // }));
+            }
+            console.log("Fim de jogo")
+            
+        } else if (isDraw) {
+          
+            setModalVisible(true);
+              playerContext?.setControlWinnerMatch(MatchStatus.Draw)
+            // setControlTurn(prev => ({
+            //   ...prev,
+            //   matchWinner : TypeMatchWinner.DRAW
+            // }));
+      
+            Alert.alert('Fim de jogo', 'Empate!');
+            console.log("Fim de jogo")
+        }
+    }
+
+    
 function boardFull(board: Cell[][]): boolean {
   for (let row of board) {
     if (row.some(cell => !cell.typePlay)) return false;
@@ -34,19 +115,22 @@ function makeMove(  board: Cell[][], row: number, col: number, xIsNext: boolean,
 
 
   
-    if (board[row][col].typePlay ) {
-        return { newBoard: board, nextPlayer: xIsNext, winner : null, isDraw: false };
-    }
+    // if (board[row][col].typePlay ) {
+    //     console.log("test")
+    //     //return { newBoard: board, nextPlayer: xIsNext, winner : null, isDraw: false };
+    // }
 
     const newBoard : Cell[][]= structuredClone(board);
 
     const newCellPosition : Cell = {
-        typePlay: xIsNext ? CellType.FIRST: CellType.SECOND, // X ou Y
-        playerId,
+        typePlay: xIsNext ? CellType.FirstType: CellType.SecondType, // X ou Y
+        playerId : xIsNext ? gameMatch?.firstPlayer?.id : gameMatch?.secondPlayer?.id,
         timestamp: Date.now()
     } 
 
     newBoard[row][col] = newCellPosition
+
+    registerMove(newCellPosition.playerId, gameMatch?.id,row,col,newCellPosition.typePlay)
 
     // Valida e indica se o player 1 ou 2 fez a combinacao vencedora, se nao é null (sem combinacao vencedora)
     const winnerAfterMove : CellType | null = calculateWinner(newBoard); 
@@ -62,6 +146,27 @@ function makeMove(  board: Cell[][], row: number, col: number, xIsNext: boolean,
     };
 
 }
+
+    async function registerMove(playerId : string | undefined, gameMatchId : string | undefined ,  positionRow : number,  positionColumn : number,typeOfPlay : CellType ) {
+      // Monta o DTO
+      let createGameMatchDto: CreateMoveDTO = {
+        responsiblePlayerId: playerId,
+        associatedMatchId: gameMatchId,
+        positionColumn : positionColumn,
+        positionRow : positionRow,
+        typeOfPlay : typeOfPlay
+      };
+
+      try {
+        // Chama a API e pega o ID retornado
+        const createdGameMatchId = await createMove(createGameMatchDto);
+        console.log(createdGameMatchId.id)
+ 
+      } catch (error) {
+        console.error("Erro ao criar partida:", error);
+        Alert.alert("Erro", "Não foi possível criar a partida.");
+      }
+    }
 
 function calculateWinner(board: Cell[][]): CellType | null { // Deve retornar quem ganhou 'X' | 'O' | ou ninguem null
   // Linhas
@@ -105,80 +210,6 @@ function calculateWinner(board: Cell[][]): CellType | null { // Deve retornar qu
   return null;
 }
 
-export default function Board(){
-
-    const playerContext = useContext(PlayerContext);
-  
-    if (!playerContext) {
-      return <Text>Contexto não disponível</Text>;
-    }
-  
-    const { controlTurn } = playerContext;
-  
-    let initialBoard = createEmptyBoard(3,3);
-
-    const [listBoard, setListBoard] = useState<Cell[][]>(initialBoard);
-    const [modalVisible, setModalVisible] = useState(false);
-
-
-    function createEmptyBoard(line : number, column : number,): Cell[][] {
-        return Array.from({ length: line }, () =>
-            Array.from({ length: column }, () => ({ typePlay: CellType.NONE}))
-        );
-    }
-
-    function handlePress(row: number, col: number, playerId?: number) {
-        if(controlTurn.gameMatch.status != MatchStatus.InProgress)
-        {
-            console.log("Nao pode preencher")
-             Alert.alert('Fim de jogo', 'Empate!');
-            return;
-        }
-        const { newBoard, nextPlayer, winner, isDraw } = makeMove(listBoard, row, col, controlTurn.xIsNext, playerId);
-
-        setListBoard(newBoard);
-        //setXIsNext(nextPlayer);
-
-        playerContext?.setControlMatch(nextPlayer)
-        
-        // setControlTurn(prev => ({
-        //   ...prev,
-        //   xIsNext: nextPlayer, // alterna jogador
-        // }));
-
-        if (winner) {
-            console.log('Fim de jogo', `O vencedor é ${winner}`);
-            setModalVisible(true);
-            if(CellType.FIRST == winner){
-              playerContext?.setControlWinnerMatch(MatchStatus.FirstPlayerWon)
-              // setControlTurn(prev => ({
-              //   ...prev,
-              //   matchWinner : TypeMatchWinner.FIRST
-              // }));
-            }
-            else{       
-              playerContext?.setControlWinnerMatch(MatchStatus.FirstPlayerWon)     
-              // setControlTurn(prev => ({
-              //   ...prev,
-              //   matchWinner : TypeMatchWinner.FIRST
-              // }));
-            }
-            console.log("Fim de jogo")
-            
-        } else if (isDraw) {
-          
-            setModalVisible(true);
-              playerContext?.setControlWinnerMatch(MatchStatus.Draw)
-            // setControlTurn(prev => ({
-            //   ...prev,
-            //   matchWinner : TypeMatchWinner.DRAW
-            // }));
-      
-            Alert.alert('Fim de jogo', 'Empate!');
-            console.log("Fim de jogo")
-        }
-    }
-
 
     return (
         <View style={styles.board}>
@@ -192,7 +223,7 @@ export default function Board(){
                                     style={styles.boardCell}
                                     onPress={() => handlePress(rowIndex, colIndex)}
                                     >
-                                    <Text style={styles.boardCellText}>{cell.typePlay == CellType.NONE? null : cell.typePlay === CellType.FIRST ? "X" : "O" }</Text>
+                                    <Text style={styles.boardCellText}>{cell.typePlay == CellType.NoneType? null : cell.typePlay === CellType.FirstType ? "X" : "O" }</Text>
                                   
                                 </TouchableOpacity>
                             ))

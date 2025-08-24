@@ -64,14 +64,14 @@ export default function InitialGameMatchScreen({navigation } : PropsRoute){
 
         <TouchableOpacity 
             style={[styles.button, { backgroundColor: '#4CAF50' }]} 
-            onPress={() => handleSelectPlayer(CellType.FIRST)}
+            onPress={() => handleSelectPlayer(CellType.FirstType)}
         >
             <Text style={styles.buttonText}>{gameMatch?.firstPlayer ? gameMatch.firstPlayer.name : "Selecione o Jogador"}  (X)</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
             style={[styles.button, { backgroundColor: '#2196F3' }]} 
-            onPress={() => handleSelectPlayer(CellType.SECOND)}
+            onPress={() => handleSelectPlayer(CellType.SecondType)}
         >
             <Text style={styles.buttonText}>{gameMatch?.secondPlayer ? gameMatch.secondPlayer.name : "Selecione o Jogador"} (O)</Text>
         </TouchableOpacity>

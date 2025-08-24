@@ -1,5 +1,5 @@
 export enum CellType {
-  NONE, // nenhuma jogada
-  FIRST,    // jogador 1
-  SECOND,    // jogador 2
+  NoneType ="NoneType", // nenhuma jogada
+  FirstType="FirstType",    // jogador 1
+  SecondType="SecondType",    // jogador 2
 }

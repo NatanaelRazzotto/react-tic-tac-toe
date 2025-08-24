@@ -50,10 +50,10 @@ export default function SelectPlayerScreen({ route, navigation }: PropsRoute) {
 
   function handleConfirm() {
     if (!selectedUser) return;
-    if (typePlayer == CellType.FIRST){
+    if (typePlayer == CellType.FirstType){
       playerContext?.setInitializeMatch(selectedUser)
     }
-    else if (typePlayer == CellType.SECOND){
+    else if (typePlayer == CellType.SecondType){
       playerContext?.setSecondaryPlayer(selectedUser)
     }
     navigation.navigate("GameInitial");
