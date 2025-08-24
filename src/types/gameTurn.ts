@@ -1,4 +1,4 @@
-import { TypeMatchWinner } from "../enums/TypeMatchWinner";
+import { MatchStatus } from "../enums/MatchStatus";
 import { ControlTurn } from "./controlTurn";
 
 export type GameTurnProps = {

@@ -1,9 +1,9 @@
-import { TypeMatchWinner } from "../enums/TypeMatchWinner";
+import { MatchStatus } from "../enums/MatchStatus";
+import { GameMatch } from "../models/gameMatch";
 import { User } from "../models/user";
 
 export type ControlTurn = {
-  player1: User | undefined;
-  player2: User | undefined;
+  gameMatch? : GameMatch;
   xIsNext: boolean;
-  matchWinner : TypeMatchWinner;
+
 }

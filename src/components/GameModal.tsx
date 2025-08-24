@@ -2,7 +2,7 @@
 import React, { useContext, useMemo } from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { ManagerGameModalProps } from '../types/managerGameModalProps';
-import { TypeMatchWinner } from '../enums/TypeMatchWinner';
+import { MatchStatus } from '../enums/MatchStatus';
 import { PlayerContext } from '../contexts/playerContext';
 
 
@@ -18,10 +18,10 @@ export default function GameModal({ visible, onClose}: ManagerGameModalProps) {
   
     const definedTitle = useMemo(() => {
    
-      if (controlTurn.matchWinner === TypeMatchWinner.NONE) {
+      if (controlTurn.gameMatch.status === MatchStatus.InProgress) {
         return "SEM DEFINIÇÃO!";
       } else if (
-        controlTurn.matchWinner === TypeMatchWinner.DRAW
+        controlTurn.gameMatch.status === MatchStatus.Draw
       ) {
         return "EMPATE!";
       }
@@ -33,19 +33,19 @@ export default function GameModal({ visible, onClose}: ManagerGameModalProps) {
     const definedDescricao = useMemo(() => {
    
       if (
-        controlTurn.matchWinner === TypeMatchWinner.DRAW
+        controlTurn.gameMatch.status === MatchStatus.Draw
       ) {
         return "Nenhum ganhador!";
       }
       else if (
-        controlTurn.matchWinner === TypeMatchWinner.FIRST
+        controlTurn.gameMatch.status === MatchStatus.FirstPlayerWon
       ) {
-        return "Jogador " + controlTurn.player1?.name + ", GANHOU! ";
+        return "Jogador " + controlTurn.gameMatch.firstPlayer?.name + ", GANHOU! ";
       }
       else if (
-        controlTurn.matchWinner === TypeMatchWinner.SECOND
+        controlTurn.gameMatch.status === MatchStatus.SecondPlayerWon
       ) { 
-        return "Jogador " + controlTurn.player2?.name + ", GANHOU! ";
+        return "Jogador " + controlTurn.gameMatch.secondPlayer?.name + ", GANHOU! ";
       }
       return ""
     }, [controlTurn]);

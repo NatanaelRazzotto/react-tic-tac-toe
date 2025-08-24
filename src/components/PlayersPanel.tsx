@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
 import { GameTurnProps } from "../types/gameTurn";
-import { TypeMatchWinner } from "../enums/TypeMatchWinner";
+import { MatchStatus } from "../enums/MatchStatus";
 import { useContext, useMemo } from "react";
 import { PlayerContext } from "../contexts/playerContext";
 
@@ -16,11 +16,11 @@ export default function PlayersPanel() {
   const player1Style = useMemo(() => {
     if (!controlTurn) return undefined;
 
-    if (controlTurn.matchWinner === TypeMatchWinner.NONE) {
+    if (controlTurn.gameMatch.status === MatchStatus.InProgress) {
       return controlTurn.xIsNext ? styles.activePlayer : undefined;
     } else if (
-      controlTurn.matchWinner === TypeMatchWinner.FIRST ||
-      controlTurn.matchWinner === TypeMatchWinner.DRAW
+      controlTurn.gameMatch.status === MatchStatus.FirstPlayerWon ||
+      controlTurn.gameMatch.status === MatchStatus.Draw
     ) {
       return styles.winnerPlayer;
     }
@@ -30,11 +30,11 @@ export default function PlayersPanel() {
   const player2Style = useMemo(() => {
     if (!controlTurn) return undefined;
 
-    if (controlTurn.matchWinner === TypeMatchWinner.NONE) {
+    if (controlTurn.gameMatch.status === MatchStatus.InProgress) {
       return !controlTurn.xIsNext ? styles.activePlayer : undefined;
     } else if (
-      controlTurn.matchWinner === TypeMatchWinner.SECOND ||
-      controlTurn.matchWinner === TypeMatchWinner.DRAW
+      controlTurn.gameMatch.status === MatchStatus.SecondPlayerWon ||
+      controlTurn.gameMatch.status === MatchStatus.Draw
     ) {
       return styles.winnerPlayer;
     }
@@ -43,22 +43,22 @@ export default function PlayersPanel() {
 
   return (
     <View style={styles.container}>
-      {controlTurn.player1 && controlTurn.player2 ? (
+      {controlTurn.gameMatch.firstPlayer && controlTurn.gameMatch.secondPlayer ? (
         <>
           <View style={[styles.playerBox, player1Style]}>
-            <Text style={styles.playerName}>{controlTurn.player1.name}</Text>
+            <Text style={styles.playerName}>{controlTurn.gameMatch.firstPlayer.name}</Text>
             <Text style={styles.symbol}>X</Text>
             {controlTurn.xIsNext &&
-              controlTurn.matchWinner === TypeMatchWinner.NONE && (
+              controlTurn.gameMatch.status === MatchStatus.InProgress && (
                 <Text style={styles.turnText}>Sua vez!</Text>
               )}
           </View>
 
           <View style={[styles.playerBox, player2Style]}>
-            <Text style={styles.playerName}>{controlTurn.player2.name}</Text>
+            <Text style={styles.playerName}>{controlTurn.gameMatch.secondPlayer.name}</Text>
             <Text style={styles.symbol}>O</Text>
             {!controlTurn.xIsNext &&
-              controlTurn.matchWinner === TypeMatchWinner.NONE && (
+              controlTurn.gameMatch.status === MatchStatus.InProgress && (
                 <Text style={styles.turnText}>Sua vez!</Text>
               )}
           </View>

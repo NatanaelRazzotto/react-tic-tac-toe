@@ -1,6 +1,6 @@
 import { createContext, useState } from 'react';
 import { ControlTurn } from '../types/controlTurn';
-import { TypeMatchWinner } from '../enums/TypeMatchWinner';
+import { MatchStatus } from '../enums/MatchStatus';
 import { User } from '../models/user';
 
 //
@@ -8,8 +8,9 @@ interface PlayerContextProps {
     controlTurn : ControlTurn;
     setInitializeMatch : (playerOne : User) => void;
     setSecondaryPlayer : (playerTwo : User) => void;
+    setIdGameMatch : (GameMatchId : string) => void;
     setControlMatch : (nextPlayer : boolean) => void;
-    setControlWinnerMatch: (winnerPlayer : TypeMatchWinner) => void;
+    setControlWinnerMatch: (winnerPlayer : MatchStatus) => void;
 }
 
 //contexto
@@ -20,21 +21,40 @@ export const PlayerContext = createContext<PlayerContextProps | undefined>(undef
 export default function PlayerContextProvider({children } : any){
 
     const [controlTurn, setControlTurn] = useState<ControlTurn>({           
-            player1: undefined,
-            player2: undefined,
-            xIsNext: true,
-            matchWinner: TypeMatchWinner.NONE,    
+            gameMatch : undefined,           
+            xIsNext: true,           
         });
 
 
     function setInitializeMatch(playerOne : User){
 
         setControlTurn( {           
-            player1: playerOne,
-            player2: undefined,
             xIsNext: true,
-            matchWinner: TypeMatchWinner.NONE,    
+            gameMatch : {
+                id : undefined,
+                firstPlayer: playerOne,
+                secondPlayer: undefined,
+                status: MatchStatus.InProgress,                 
+        },
+           
         });
+         console.log(controlTurn)
+    }
+
+    function setIdGameMatch(GameMatchId : string){
+
+        setControlTurn(prev => {
+       
+            return {
+                ...prev,
+                gameMatch: prev.gameMatch
+                    ? { ...prev.gameMatch, id: GameMatchId }
+                    : { id: GameMatchId , firstPlayer: undefined, secondPlayer: undefined,  status: MatchStatus.InProgress }        
+            
+            };
+        });
+
+        console.log(controlTurn)
     }
 
     function setSecondaryPlayer(playerTwo : User){
@@ -43,10 +63,13 @@ export default function PlayerContextProvider({children } : any){
        
             return {
                 ...prev,
-                player2: playerTwo,
+                gameMatch: prev.gameMatch
+                    ? { ...prev.gameMatch, secondPlayer: playerTwo }
+                    : { id: undefined, firstPlayer: undefined, secondPlayer: playerTwo, status: MatchStatus.InProgress }        
             
             };
         });
+         console.log(controlTurn)
     }
 
     function setControlMatch(nextPlayer : boolean){
@@ -59,11 +82,11 @@ export default function PlayerContextProvider({children } : any){
         });
     }
 
-    function setControlWinnerMatch(winnerPlayer : TypeMatchWinner){
+    function setControlWinnerMatch(winnerPlayer : MatchStatus){
        setControlTurn(prev => {       
             return {
                 ...prev,
-                  matchWinner: winnerPlayer, 
+                  status: winnerPlayer, 
             
             };
         });
@@ -75,7 +98,8 @@ export default function PlayerContextProvider({children } : any){
         setInitializeMatch: setInitializeMatch,
         setSecondaryPlayer: setSecondaryPlayer,
         setControlMatch : setControlMatch,
-        setControlWinnerMatch : setControlWinnerMatch
+        setControlWinnerMatch : setControlWinnerMatch,
+        setIdGameMatch : setIdGameMatch
 
     }
 

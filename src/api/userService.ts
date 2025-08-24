@@ -1,4 +1,5 @@
 // src/api/userService.ts
+import { CreateGameMatchDto } from "../models/CreateGameMatchDto";
 import { User } from "../models/user";
 import apiClient from "./apiClient";
 
@@ -13,7 +14,12 @@ export async function getUserById(id: number): Promise<User> {
   return response.data;
 }
 
-export async function createUser(user: Omit<User, "id">): Promise<number> {
-  const response = await apiClient.post<number>("/users", user);
+export async function createUser(user: Omit<User, "id">): Promise<string> {
+  const response = await apiClient.post<string>("/users", user);
+  return response.data;
+}
+
+export async function createGameMatch(gameMatch: Omit<CreateGameMatchDto, "id">): Promise<any> {
+  const response = await apiClient.post<string>("/gamematch", gameMatch);
   return response.data;
 }

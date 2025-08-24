@@ -30,9 +30,9 @@ export default function SelectPlayerScreen({ route, navigation }: PropsRoute) {
           user.name.toLowerCase().includes(search.toLowerCase())
         )
 
-      if (playerContext?.controlTurn.player1){
+      if (playerContext?.controlTurn.gameMatch?.firstPlayer){
         filteredUsers = filteredUsers.filter(user =>
-          user.id !== playerContext?.controlTurn.player1?.id
+          user.id !== playerContext?.controlTurn.gameMatch?.firstPlayer?.id
         );
       }
       setfilteredUsers(filteredUsers)

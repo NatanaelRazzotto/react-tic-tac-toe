@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { GameTurnProps } from "../types/gameTurn";
 import { CellType } from "../enums/CellType";
-import { TypeMatchWinner } from "../enums/TypeMatchWinner";
+import { MatchStatus } from "../enums/MatchStatus";
 import GameModal from "./GameModal";
 import { PlayerContext } from "../contexts/playerContext";
 import { getUsers } from "../api/userService";
@@ -128,7 +128,7 @@ export default function Board(){
     }
 
     function handlePress(row: number, col: number, playerId?: number) {
-        if(controlTurn.matchWinner != TypeMatchWinner.NONE)
+        if(controlTurn.gameMatch.status != MatchStatus.InProgress)
         {
             console.log("Nao pode preencher")
              Alert.alert('Fim de jogo', 'Empate!');
@@ -150,14 +150,14 @@ export default function Board(){
             console.log('Fim de jogo', `O vencedor é ${winner}`);
             setModalVisible(true);
             if(CellType.FIRST == winner){
-              playerContext?.setControlWinnerMatch(TypeMatchWinner.FIRST)
+              playerContext?.setControlWinnerMatch(MatchStatus.FirstPlayerWon)
               // setControlTurn(prev => ({
               //   ...prev,
               //   matchWinner : TypeMatchWinner.FIRST
               // }));
             }
             else{       
-              playerContext?.setControlWinnerMatch(TypeMatchWinner.FIRST)     
+              playerContext?.setControlWinnerMatch(MatchStatus.FirstPlayerWon)     
               // setControlTurn(prev => ({
               //   ...prev,
               //   matchWinner : TypeMatchWinner.FIRST
@@ -168,7 +168,7 @@ export default function Board(){
         } else if (isDraw) {
           
             setModalVisible(true);
-              playerContext?.setControlWinnerMatch(TypeMatchWinner.DRAW)
+              playerContext?.setControlWinnerMatch(MatchStatus.Draw)
             // setControlTurn(prev => ({
             //   ...prev,
             //   matchWinner : TypeMatchWinner.DRAW

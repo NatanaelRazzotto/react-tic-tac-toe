@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import Board from '../components/Board';
 import PlayersPanel from '../components/PlayersPanel';
 import { useContext, useState } from 'react';
-import { TypeMatchWinner } from '../enums/TypeMatchWinner';
+import { MatchStatus } from '../enums/MatchStatus';
 import { ControlTurn } from '../types/controlTurn';
 import { PlayerContext } from '../contexts/playerContext';
 export default function PlayGameScreen(){

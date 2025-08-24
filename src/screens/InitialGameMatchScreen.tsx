@@ -8,7 +8,9 @@ import { CellType } from '../enums/CellType';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { PlayStackParamList } from '../types/playStackParamList';
-import { getUsers } from '../api/userService';
+import { createGameMatch, getUsers } from '../api/userService';
+import { CreateGameMatchDto } from '../models/CreateGameMatchDto';
+import { GameMatch } from '../models/gameMatch';
 
 type PropsRoute = NativeStackScreenProps<PlayStackParamList, "GameInitial">;
 
@@ -20,8 +22,8 @@ export default function InitialGameMatchScreen({navigation } : PropsRoute){
       return <Text>Contexto não disponível</Text>;
     }
   
-    const { controlTurn } = playerContext;  
-    
+    const { controlTurn } = playerContext;
+    const { gameMatch } = controlTurn;
 
     function navToPlayGame(){
         navigation.navigate('GamePlay')
@@ -32,9 +34,27 @@ export default function InitialGameMatchScreen({navigation } : PropsRoute){
         navigation.navigate("SelectPlayer", { typePlayer: playerSelect });
     }
 
-    function handleSelectStart(player: number) {
-        // Aqui você pode enviar para a próxima tela qual player foi escolhido
-        navigation.navigate('GamePlay');
+    async function handleSelectStart() {
+      // Monta o DTO
+      let createGameMatchDto: CreateGameMatchDto = {
+        firstPlayerId: gameMatch?.firstPlayer?.id,
+        secondPlayerId: gameMatch?.secondPlayer?.id,
+        open: gameMatch?.open ?? new Date(),
+      };
+
+      try {
+        // Chama a API e pega o ID retornado
+        const createdGameMatchId = await createGameMatch(createGameMatchDto);
+        console.log(createdGameMatchId.id)
+        // Atualiza algum estado local para mostrar o ID ou usar depois
+          playerContext?.setIdGameMatch(createdGameMatchId.id);
+
+        // Se quiser passar o ID para a próxima tela:
+        navigation.navigate("GamePlay");
+      } catch (error) {
+        console.error("Erro ao criar partida:", error);
+        Alert.alert("Erro", "Não foi possível criar a partida.");
+      }
     }
 
     return (
@@ -46,20 +66,20 @@ export default function InitialGameMatchScreen({navigation } : PropsRoute){
             style={[styles.button, { backgroundColor: '#4CAF50' }]} 
             onPress={() => handleSelectPlayer(CellType.FIRST)}
         >
-            <Text style={styles.buttonText}>{controlTurn.player1 ? controlTurn.player1.name : "Selecione o Jogador"}  (X)</Text>
+            <Text style={styles.buttonText}>{gameMatch?.firstPlayer ? gameMatch.firstPlayer.name : "Selecione o Jogador"}  (X)</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
             style={[styles.button, { backgroundColor: '#2196F3' }]} 
             onPress={() => handleSelectPlayer(CellType.SECOND)}
         >
-            <Text style={styles.buttonText}>{controlTurn.player2 ? controlTurn.player2.name : "Selecione o Jogador"} (O)</Text>
+            <Text style={styles.buttonText}>{gameMatch?.secondPlayer ? gameMatch.secondPlayer.name : "Selecione o Jogador"} (O)</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
-            style={[styles.button,  { backgroundColor: controlTurn.player1 && controlTurn.player2  ?  '#2196F3' : '#ccc' }]} 
-            onPress={() => handleSelectStart(2)}
-            disabled={controlTurn.player1 && controlTurn.player2 ? false : true} 
+            style={[styles.button,  { backgroundColor: gameMatch?.firstPlayer && gameMatch?.secondPlayer  ?  '#2196F3' : '#ccc' }]} 
+            onPress={() => handleSelectStart()}
+            disabled={gameMatch?.firstPlayer && gameMatch?.secondPlayer ? false : true} 
         >
             <Text style={styles.buttonText}>INICIAR</Text>
         </TouchableOpacity>
