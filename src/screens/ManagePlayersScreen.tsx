@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react"; 
 import {
   View,
   Text,
@@ -9,26 +9,31 @@ import {
   Alert,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
-
-type Player = {
-  id: number;
-  name: string;
-  symbol: "X" | "O";
-};
+import { createUser, getUsers } from "../api/userService";
+import { User } from "../models/user";
 
 export default function ManagePlayersScreen() {
-  const [players, setPlayers] = useState<Player[]>([
-    { id: 1, name: "Alice", symbol: "X" },
-    { id: 2, name: "Bob", symbol: "O" },
-  ]);
+  const [players, setPlayers] = useState<User[]>([]);
 
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [nickname, setNickname] = useState("");
   const [symbol, setSymbol] = useState<"X" | "O">("X");
-  const [editingPlayerId, setEditingPlayerId] = useState<number | null>(null);
+  const [editingPlayerId, setEditingPlayerId] = useState<string | null>(null);
+
+  const [searchUsers, setSearchUsers] = useState<User[]>([]);
+
+  useEffect(() => {
+    async function loadUsers() {
+      const returnUser: User[] = await getUsers();
+      setSearchUsers(returnUser);
+    }
+    loadUsers();
+  }, []);
 
   function handleAddOrEditPlayer() {
-    if (!name.trim()) {
-      Alert.alert("Erro", "Digite o nome do jogador.");
+    if (!name.trim() || !email.trim() || !nickname.trim()) {
+      Alert.alert("Erro", "Preencha todos os campos.");
       return;
     }
 
@@ -36,32 +41,38 @@ export default function ManagePlayersScreen() {
       // Editando
       setPlayers((prev) =>
         prev.map((p) =>
-          p.id === editingPlayerId ? { ...p, name, symbol } : p
+          p.id === editingPlayerId ? { ...p, name, email, nickname, symbol } : p
         )
       );
       setEditingPlayerId(null);
     } else {
       // Novo jogador
-      const newPlayer: Player = {
-        id: Date.now(),
+      let newPlayer: User = {
+        id: Math.random().toString(), // temporário
         name,
-        symbol,
+        email,
+        nickname,
       };
+
+      createUser(newPlayer);
       setPlayers((prev) => [...prev, newPlayer]);
     }
 
     setName("");
+    setEmail("");
+    setNickname("");
     setSymbol("X");
   }
 
-  function handleDeletePlayer(id: number) {
+  function handleDeletePlayer(id: string) {
     setPlayers((prev) => prev.filter((p) => p.id !== id));
   }
 
-  function handleEditPlayer(player: Player) {
+  function handleEditPlayer(player: User) {
     setEditingPlayerId(player.id);
     setName(player.name);
-    setSymbol(player.symbol);
+    setEmail(player.email);
+    setNickname(player.nickname);
   }
 
   return (
@@ -75,27 +86,19 @@ export default function ManagePlayersScreen() {
         onChangeText={setName}
       />
 
-      <View style={styles.symbolContainer}>
-        <TouchableOpacity
-          style={[
-            styles.symbolButton,
-            symbol === "X" && styles.symbolSelected,
-          ]}
-          onPress={() => setSymbol("X")}
-        >
-          <Text style={styles.symbolText}>X</Text>
-        </TouchableOpacity>
+      <TextInput
+        style={styles.input}
+        placeholder="Email do jogador"
+        value={email}
+        onChangeText={setEmail}
+      />
 
-        <TouchableOpacity
-          style={[
-            styles.symbolButton,
-            symbol === "O" && styles.symbolSelected,
-          ]}
-          onPress={() => setSymbol("O")}
-        >
-          <Text style={styles.symbolText}>O</Text>
-        </TouchableOpacity>
-      </View>
+      <TextInput
+        style={styles.input}
+        placeholder="Nickname do jogador"
+        value={nickname}
+        onChangeText={setNickname}
+      />
 
       <TouchableOpacity style={styles.addButton} onPress={handleAddOrEditPlayer}>
         <Text style={styles.addButtonText}>
@@ -105,12 +108,12 @@ export default function ManagePlayersScreen() {
 
       <FlatList
         style={{ marginTop: 20 }}
-        data={players}
+        data={searchUsers}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.playerItem}>
             <Text style={styles.playerName}>
-              {item.name} ({item.symbol})
+              {item.name} ({item.nickname})
             </Text>
             <View style={{ flexDirection: "row" }}>
               <TouchableOpacity
@@ -137,77 +140,13 @@ export default function ManagePlayersScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#f5f5f5",
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 15,
-    textAlign: "center",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 10,
-    backgroundColor: "#fff",
-    marginBottom: 10,
-  },
-  symbolContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 10,
-  },
-  symbolButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: "#eee",
-    justifyContent: "center",
-    alignItems: "center",
-    marginHorizontal: 10,
-  },
-  symbolSelected: {
-    backgroundColor: "#4CAF50",
-  },
-  symbolText: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  addButton: {
-    backgroundColor: "#2196F3",
-    padding: 12,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  addButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  playerItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 12,
-    borderRadius: 8,
-    backgroundColor: "#fff",
-    marginBottom: 8,
-    alignItems: "center",
-  },
-  playerName: {
-    fontSize: 16,
-  },
-  deleteButton: {
-    backgroundColor: "#e53935",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 6,
-  },
-  deleteText: {
-    color: "#fff",
-    fontWeight: "600",
-  },
+  container: { flex: 1, backgroundColor: "#f5f5f5", padding: 20 },
+  title: { fontSize: 24, fontWeight: "bold", marginBottom: 15, textAlign: "center" },
+  input: { borderWidth: 1, borderColor: "#ccc", borderRadius: 8, padding: 10, backgroundColor: "#fff", marginBottom: 10 },
+  addButton: { backgroundColor: "#2196F3", padding: 12, borderRadius: 8, alignItems: "center" },
+  addButtonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  playerItem: { flexDirection: "row", justifyContent: "space-between", padding: 12, borderRadius: 8, backgroundColor: "#fff", marginBottom: 8, alignItems: "center" },
+  playerName: { fontSize: 16 },
+  deleteButton: { backgroundColor: "#e53935", paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6 },
+  deleteText: { color: "#fff", fontWeight: "600" },
 });

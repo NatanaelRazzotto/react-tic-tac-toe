@@ -5,6 +5,7 @@ import { CellType } from "../enums/CellType";
 import { TypeMatchWinner } from "../enums/TypeMatchWinner";
 import GameModal from "./GameModal";
 import { PlayerContext } from "../contexts/playerContext";
+import { getUsers } from "../api/userService";
 
 
 type Cell = {
@@ -113,7 +114,6 @@ export default function Board(){
     }
   
     const { controlTurn } = playerContext;
-
   
     let initialBoard = createEmptyBoard(3,3);
 

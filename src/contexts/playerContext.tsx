@@ -1,13 +1,13 @@
 import { createContext, useState } from 'react';
 import { ControlTurn } from '../types/controlTurn';
 import { TypeMatchWinner } from '../enums/TypeMatchWinner';
-import { Player } from '../models/player';
+import { User } from '../models/user';
 
 //
 interface PlayerContextProps {
     controlTurn : ControlTurn;
-    setInitializeMatch : (playerOne : Player) => void;
-    setSecondaryPlayer : (playerTwo : Player) => void;
+    setInitializeMatch : (playerOne : User) => void;
+    setSecondaryPlayer : (playerTwo : User) => void;
     setControlMatch : (nextPlayer : boolean) => void;
     setControlWinnerMatch: (winnerPlayer : TypeMatchWinner) => void;
 }
@@ -27,7 +27,7 @@ export default function PlayerContextProvider({children } : any){
         });
 
 
-    function setInitializeMatch(playerOne : Player){
+    function setInitializeMatch(playerOne : User){
 
         setControlTurn( {           
             player1: playerOne,
@@ -37,7 +37,7 @@ export default function PlayerContextProvider({children } : any){
         });
     }
 
-    function setSecondaryPlayer(playerTwo : Player){
+    function setSecondaryPlayer(playerTwo : User){
 
         setControlTurn(prev => {
        

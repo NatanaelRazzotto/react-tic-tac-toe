@@ -2,12 +2,13 @@ import { View, Text, TouchableOpacity, StyleSheet, Alert, Button } from 'react-n
 import { StatusBar } from 'expo-status-bar';
 import Board from '../components/Board';
 import { useNavigation } from '@react-navigation/native';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { PlayerContext } from '../contexts/playerContext';
 import { CellType } from '../enums/CellType';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { PlayStackParamList } from '../types/playStackParamList';
+import { getUsers } from '../api/userService';
 
 type PropsRoute = NativeStackScreenProps<PlayStackParamList, "GameInitial">;
 
@@ -19,7 +20,8 @@ export default function InitialGameMatchScreen({navigation } : PropsRoute){
       return <Text>Contexto não disponível</Text>;
     }
   
-    const { controlTurn } = playerContext;
+    const { controlTurn } = playerContext;  
+    
 
     function navToPlayGame(){
         navigation.navigate('GamePlay')

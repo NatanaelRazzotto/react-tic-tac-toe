@@ -1,19 +1,13 @@
-import { useState , useContext, use} from "react";
+import { useState , useContext, use, useEffect} from "react";
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native";
 import { PlayerContext } from "../contexts/playerContext";
-import { Player } from "../models/player";
+import { User } from "../models/user";
 import { CellType } from "../enums/CellType";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { PlayStackParamList } from "../types/playStackParamList";
-
-const mockUsers : Array <Player>= [
-  { id: "1", name: "Alice" },
-  { id: "2", name: "Bob" },
-  { id: "3", name: "Carlos" },
-
-];
+import { getUsers } from "../api/userService";
 
 type PropsRoute = NativeStackScreenProps<PlayStackParamList, "SelectPlayer">;
 
@@ -23,21 +17,33 @@ export default function SelectPlayerScreen({ route, navigation }: PropsRoute) {
 
   const [search, setSearch] = useState("");
   const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [filteredUsers, setfilteredUsers] = useState<Array<User>>([]);
 
   const playerContext  = useContext(PlayerContext);
 
-  let filteredUsers : Player[] = mockUsers
-    .filter((user) =>
-      user.name.toLowerCase().includes(search.toLowerCase())
-    )
+  useEffect(() => {
+    async function loadUsers() {
+      const returnUser : Array<User> = await getUsers()
+      console.log(returnUser)
+      let filteredUsers : User[] = returnUser
+        .filter((user) =>
+          user.name.toLowerCase().includes(search.toLowerCase())
+        )
 
-  if (playerContext?.controlTurn.player1){
-    filteredUsers = filteredUsers.filter(user =>
-      user.id !== playerContext?.controlTurn.player1?.id
-    );
-  }
+      if (playerContext?.controlTurn.player1){
+        filteredUsers = filteredUsers.filter(user =>
+          user.id !== playerContext?.controlTurn.player1?.id
+        );
+      }
+      setfilteredUsers(filteredUsers)
+    }
+    loadUsers();
+  }, []);
 
-  function handleSelect(user: Player) {
+
+
+
+  function handleSelect(user: User) {
     console.log(user)  
     setSelectedUser(user);
   }
