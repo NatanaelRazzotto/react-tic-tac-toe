@@ -21,6 +21,11 @@ export async function createUser(user: Omit<User, "id">): Promise<string> {
   return response.data;
 }
 
+export async function updateUser(userId : string , user: Omit<User, "id">): Promise<string> {
+  const response = await apiClient.put<string>("/users/" +userId, user);
+  return response.data;
+}
+
 export async function createGameMatch(gameMatch: Omit<CreateGameMatchDto, "id">): Promise<any> {
   const response = await apiClient.post<string>("/gamematch", gameMatch);
   return response.data;

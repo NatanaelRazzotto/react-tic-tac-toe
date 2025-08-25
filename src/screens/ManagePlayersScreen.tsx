@@ -9,7 +9,7 @@ import {
   Alert,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { createUser, getUsers } from "../api/userService";
+import { createUser, getUsers, updateUser } from "../api/userService";
 import { User } from "../models/user";
 
 export default function ManagePlayersScreen() {
@@ -24,14 +24,16 @@ export default function ManagePlayersScreen() {
   const [searchUsers, setSearchUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    async function loadUsers() {
-      const returnUser: User[] = await getUsers();
-      setSearchUsers(returnUser);
-    }
+   
     loadUsers();
   }, []);
 
-  function handleAddOrEditPlayer() {
+   async function loadUsers() {
+      const returnUser: User[] = await getUsers();
+      setSearchUsers(returnUser);
+    }
+
+  async  function handleAddOrEditPlayer() {
     if (!name.trim() || !email.trim() || !nickname.trim()) {
       Alert.alert("Erro", "Preencha todos os campos.");
       return;
@@ -39,23 +41,33 @@ export default function ManagePlayersScreen() {
 
     if (editingPlayerId !== null) {
       // Editando
-      setPlayers((prev) =>
-        prev.map((p) =>
-          p.id === editingPlayerId ? { ...p, name, email, nickname, symbol } : p
-        )
-      );
-      setEditingPlayerId(null);
-    } else {
-      // Novo jogador
-      let newPlayer: User = {
-        id: Math.random().toString(), // temporário
+
+       let newPlayer: User = {
+        id: editingPlayerId,
         name,
         email,
         nickname,
       };
 
-      createUser(newPlayer);
-      setPlayers((prev) => [...prev, newPlayer]);
+      await updateUser(editingPlayerId, newPlayer);
+
+      setEditingPlayerId(null);
+
+      // 🔹 Atualiza lista após update
+      await loadUsers();
+    } else {
+      // Novo jogador
+      let newPlayer: User = {
+        id: "",
+        name,
+        email,
+        nickname,
+      };
+
+      await createUser(newPlayer);
+
+       // 🔹 Atualiza lista após create
+      await loadUsers();
     }
 
     setName("");
