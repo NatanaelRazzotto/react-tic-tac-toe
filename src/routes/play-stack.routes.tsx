@@ -1,8 +1,8 @@
 import { createStackNavigator } from '@react-navigation/stack';
 
-import InitialGameMatchScreen from '../screens/InitialGameMatchScreen';
+import InitialGameMatchScreen from '../screens/matchGame/InitialGameMatchScreen';
 import PlayGameScreen from '../screens/PlayGameScreen';
-import SelectPlayerScreen from '../screens/SelectPlayerScreen';
+import SelectPlayerScreen from '../screens/matchGame/SelectPlayerScreen';
 import { PlayStackParamList } from '../types/playStackParamList';
 
 const Stack = createStackNavigator<PlayStackParamList>();

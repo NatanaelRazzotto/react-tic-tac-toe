@@ -1,6 +1,6 @@
 import { CellType } from "../enums/CellType";
 import { MatchStatus } from "../enums/MatchStatus";
-import { User } from "./user";
+import { User } from "../models/user";
 
 export type CreateMoveDTO = {
 

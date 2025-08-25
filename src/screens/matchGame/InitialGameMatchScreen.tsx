@@ -1,20 +1,30 @@
 import { View, Text, TouchableOpacity, StyleSheet, Alert, Button } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import Board from '../components/Board';
+import Board from '../../components/Board';
 import { useNavigation } from '@react-navigation/native';
-import { useContext, useEffect } from 'react';
-import { PlayerContext } from '../contexts/playerContext';
-import { CellType } from '../enums/CellType';
+import { useContext, useEffect, useState } from 'react';
+import { PlayerContext } from '../../contexts/playerContext';
+import { CellType } from '../../enums/CellType';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { PlayStackParamList } from '../types/playStackParamList';
-import { createGameMatch, getUsers } from '../api/userService';
-import { CreateGameMatchDto } from '../models/CreateGameMatchDto';
-import { GameMatch } from '../models/gameMatch';
+import { PlayStackParamList } from '../../types/playStackParamList';
+import { createGameMatch } from '../../api/gameMatchService';
+import { CreateGameMatchDto } from '../../dto/createGameMatchDto';
+import { GameMatch } from '../../models/gameMatch';
+import { currentColors } from '../../styles/theme';
+import NotifyModal from '../../components/modais/NotifyModal';
+import { NotifyModalProps } from '../../types/notifyModalProps';
 
 type PropsRoute = NativeStackScreenProps<PlayStackParamList, "GameInitial">;
 
 export default function InitialGameMatchScreen({navigation } : PropsRoute){
+
+    const [modalState, setModalState] = useState<NotifyModalProps>({
+      visible: false,
+      title: "AVISO",
+      mensage :"",
+      onClose : () => closeModal(),
+    });
 
     const playerContext = useContext(PlayerContext);
   
@@ -24,10 +34,6 @@ export default function InitialGameMatchScreen({navigation } : PropsRoute){
   
     const { controlTurn } = playerContext;
     const { gameMatch } = controlTurn;
-
-    function navToPlayGame(){
-        navigation.navigate('GamePlay')
-    } 
 
     function handleSelectPlayer(playerSelect: CellType) {
         // Aqui você pode enviar para a próxima tela qual player foi escolhido
@@ -52,9 +58,14 @@ export default function InitialGameMatchScreen({navigation } : PropsRoute){
         // Se quiser passar o ID para a próxima tela:
         navigation.navigate("GamePlay");
       } catch (error) {
-        console.error("Erro ao criar partida:", error);
-        Alert.alert("Erro", "Não foi possível criar a partida.");
+
+        setModalState(prev => ({ ...prev, visible: true, mensage: "Não foi possível criar a partida." }));
       }
+    }
+
+    
+    function closeModal() {
+      setModalState(prev => ({ ...prev, visible: false }));
     }
 
     return (
@@ -63,15 +74,17 @@ export default function InitialGameMatchScreen({navigation } : PropsRoute){
         <Text style={styles.subtitle}>Selecione o jogador:</Text>
 
         <TouchableOpacity 
-            style={[styles.button, { backgroundColor: '#4CAF50' }]} 
+            style={[styles.button]} 
             onPress={() => handleSelectPlayer(CellType.FirstType)}
+             disabled={gameMatch?.firstPlayer ? true : false} 
         >
             <Text style={styles.buttonText}>{gameMatch?.firstPlayer ? gameMatch.firstPlayer.name : "Selecione o Jogador"}  (X)</Text>
         </TouchableOpacity>
 
         <TouchableOpacity 
-            style={[styles.button, { backgroundColor: '#2196F3' }]} 
+            style={[styles.button]} 
             onPress={() => handleSelectPlayer(CellType.SecondType)}
+             disabled={gameMatch?.secondPlayer ? true : false} 
         >
             <Text style={styles.buttonText}>{gameMatch?.secondPlayer ? gameMatch.secondPlayer.name : "Selecione o Jogador"} (O)</Text>
         </TouchableOpacity>
@@ -84,7 +97,16 @@ export default function InitialGameMatchScreen({navigation } : PropsRoute){
             <Text style={styles.buttonText}>INICIAR</Text>
         </TouchableOpacity>
 
+            <NotifyModal
+              title={modalState.title}
+              mensage={modalState.mensage}
+              visible={modalState.visible}
+              onClose={modalState.onClose}
+          />
+
         <StatusBar style="auto" />
+
+      
         </View>
     )
 
@@ -113,6 +135,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 15,
     alignItems: 'center',
+    backgroundColor: currentColors.secondary,
   },
   buttonText: {
     color: '#fff',

@@ -2,12 +2,12 @@ import { useState , useContext, use, useEffect} from "react";
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native";
-import { PlayerContext } from "../contexts/playerContext";
-import { User } from "../models/user";
-import { CellType } from "../enums/CellType";
+import { PlayerContext } from "../../contexts/playerContext";
+import { User } from "../../models/user";
+import { CellType } from "../../enums/CellType";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { PlayStackParamList } from "../types/playStackParamList";
-import { getUsers } from "../api/userService";
+import { PlayStackParamList } from "../../types/playStackParamList";
+import { getUsers } from "../../api/userService";
 
 type PropsRoute = NativeStackScreenProps<PlayStackParamList, "SelectPlayer">;
 

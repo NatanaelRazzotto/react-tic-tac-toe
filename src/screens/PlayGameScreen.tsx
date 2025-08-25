@@ -6,20 +6,21 @@ import { useContext, useState } from 'react';
 import { MatchStatus } from '../enums/MatchStatus';
 import { ControlTurn } from '../types/controlTurn';
 import { PlayerContext } from '../contexts/playerContext';
-export default function PlayGameScreen(){
+import { globalStyles } from '../styles/globalStyles';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { PlayStackParamList } from '../types/playStackParamList';
 
-    
-
+type PropsRoute = NativeStackScreenProps<PlayStackParamList, "GamePlay">;  
+export default function PlayGameScreen({navigation} : PropsRoute){   
 
     return (
-        <View style={styles.container}>           
+        <View style={globalStyles.container}>           
 
-            <Text >
-                Play works!!!
-            </Text>
+            <Text style={globalStyles.title}>Jogo da Velha</Text>
+            <Text style={globalStyles.subtitle}>Boa sorte!</Text>
 
             <PlayersPanel/>
-            <Board ></Board>
+            <Board navigation={navigation}></Board>
 
             <StatusBar style="auto" />
         </View>
@@ -27,11 +28,3 @@ export default function PlayGameScreen(){
 
    
 }
- const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f5f5f5',
-    }
- })

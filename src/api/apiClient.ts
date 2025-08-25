@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: "http://localhost:5180/api", // 👈 servidor backend
+  baseURL: process.env.EXPO_PUBLIC_API_URL+"/api", // 👈 servidor backend
   timeout: 5000,
   headers: {
     "Content-Type": "application/json",

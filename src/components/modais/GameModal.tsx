@@ -1,9 +1,9 @@
 // GameModal.tsx
 import React, { useContext, useMemo } from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { ManagerGameModalProps } from '../types/managerGameModalProps';
-import { MatchStatus } from '../enums/MatchStatus';
-import { PlayerContext } from '../contexts/playerContext';
+import { ManagerGameModalProps } from '../../types/managerGameModalProps';
+import { MatchStatus } from '../../enums/MatchStatus';
+import { PlayerContext } from '../../contexts/playerContext';
 
 
 export default function GameModal({ visible, onClose}: ManagerGameModalProps) {

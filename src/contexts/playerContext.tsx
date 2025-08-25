@@ -6,6 +6,7 @@ import { User } from '../models/user';
 //
 interface PlayerContextProps {
     controlTurn : ControlTurn;
+    resetControlTurn : () => void;
     setInitializeMatch : (playerOne : User) => void;
     setSecondaryPlayer : (playerTwo : User) => void;
     setIdGameMatch : (GameMatchId : string) => void;
@@ -24,6 +25,16 @@ export default function PlayerContextProvider({children } : any){
             gameMatch : undefined,           
             xIsNext: true,           
         });
+
+    function resetControlTurn(){
+
+        setControlTurn( {           
+            gameMatch : undefined,           
+            xIsNext: true,          
+           
+        });
+     
+    }
 
 
     function setInitializeMatch(playerOne : User){
@@ -98,6 +109,7 @@ export default function PlayerContextProvider({children } : any){
 
     const contextValue : PlayerContextProps = {
         controlTurn : controlTurn,
+        resetControlTurn: resetControlTurn,
         setInitializeMatch: setInitializeMatch,
         setSecondaryPlayer: setSecondaryPlayer,
         setControlMatch : setControlMatch,

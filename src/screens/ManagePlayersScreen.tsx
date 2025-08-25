@@ -18,43 +18,39 @@ export default function ManagePlayersScreen() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [nickname, setNickname] = useState("");
-  const [symbol, setSymbol] = useState<"X" | "O">("X");
+
   const [editingPlayerId, setEditingPlayerId] = useState<string | null>(null);
 
   const [searchUsers, setSearchUsers] = useState<User[]>([]);
 
   useEffect(() => {
-   
     loadUsers();
   }, []);
 
-   async function loadUsers() {
-      const returnUser: User[] = await getUsers();
-      setSearchUsers(returnUser);
-    }
+  async function loadUsers() {
+    const returnUser: User[] = await getUsers();
+    setSearchUsers(returnUser);
+  }
 
-  async  function handleAddOrEditPlayer() {
+  async function handleAddOrEditPlayer() {
     if (!name.trim() || !email.trim() || !nickname.trim()) {
       Alert.alert("Erro", "Preencha todos os campos.");
       return;
     }
 
     if (editingPlayerId !== null) {
-      // Editando
 
-       let newPlayer: User = {
+       let editPlayer: User = {
         id: editingPlayerId,
         name,
         email,
         nickname,
       };
 
-      await updateUser(editingPlayerId, newPlayer);
+      await updateUser(editingPlayerId, editPlayer);
 
       setEditingPlayerId(null);
 
-      // 🔹 Atualiza lista após update
-      await loadUsers();
     } else {
       // Novo jogador
       let newPlayer: User = {
@@ -64,16 +60,14 @@ export default function ManagePlayersScreen() {
         nickname,
       };
 
-      await createUser(newPlayer);
+      await createUser(newPlayer);    
+    }   
 
-       // 🔹 Atualiza lista após create
-      await loadUsers();
-    }
+    await loadUsers();
 
     setName("");
     setEmail("");
     setNickname("");
-    setSymbol("X");
   }
 
   function handleDeletePlayer(id: string) {
