@@ -8,6 +8,6 @@ export async function createGameMatch(gameMatch: Omit<CreateGameMatchDto, "id">)
 }
 
 export async function endGameMatch(gameMatchId : string,updateGameMatchDto: Omit<UpdateGameMatchDto, "id">): Promise<any> {
-  const response = await apiClient.put<string>("/gamematch/"+gameMatchId, updateGameMatchDto);
+  const response = await apiClient.put<string>("/gamematch/finish/"+gameMatchId, updateGameMatchDto);
   return response.data;
 }

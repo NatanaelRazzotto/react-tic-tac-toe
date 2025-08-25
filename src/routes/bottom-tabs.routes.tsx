@@ -13,14 +13,14 @@ import { bottomTabOptions } from '../styles/navigationTheme';
 export function BottomTabsRoutes() {
   return (
     <Navigator screenOptions={bottomTabOptions}>
-      <Screen 
+      {/* <Screen 
         name="home" 
         component={HomeScreen} 
         options={{
              title: "🏠 Início",
           tabBarIcon: ({ color, size }) => <Ionicons name="home" color={color} size={size} />,
         }}
-      />
+      /> */}
       <Screen 
         name="play" 
         component={PlayStackRoutes} 

@@ -7,7 +7,6 @@ export const globalStyles = StyleSheet.create({
     flex: 1,
     backgroundColor: currentColors.background,
     padding: Spacing.md,
-
     justifyContent: 'center',
     alignItems: 'center',
   },

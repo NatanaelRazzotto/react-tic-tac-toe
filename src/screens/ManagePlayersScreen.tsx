@@ -11,6 +11,8 @@ import {
 import { StatusBar } from "expo-status-bar";
 import { createUser, getUsers, updateUser } from "../api/userService";
 import { User } from "../models/user";
+import { currentColors } from "../styles/theme";
+import { globalStyles } from "../styles/globalStyles";
 
 export default function ManagePlayersScreen() {
   const [players, setPlayers] = useState<User[]>([]);
@@ -82,8 +84,8 @@ export default function ManagePlayersScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Gerenciar Jogadores</Text>
+    <View style={globalStyles.container}>
+      <Text style={globalStyles.title}>Gerenciar Jogadores</Text>
 
       <TextInput
         style={styles.input}
@@ -123,7 +125,7 @@ export default function ManagePlayersScreen() {
             </Text>
             <View style={{ flexDirection: "row" }}>
               <TouchableOpacity
-                style={[styles.deleteButton, { backgroundColor: "#4CAF50", marginRight: 5 }]}
+                style={[styles.editedButton]}
                 onPress={() => handleEditPlayer(item)}
               >
                 <Text style={styles.deleteText}>Editar</Text>
@@ -146,13 +148,45 @@ export default function ManagePlayersScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f5f5f5", padding: 20 },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 15, textAlign: "center" },
-  input: { borderWidth: 1, borderColor: "#ccc", borderRadius: 8, padding: 10, backgroundColor: "#fff", marginBottom: 10 },
-  addButton: { backgroundColor: "#2196F3", padding: 12, borderRadius: 8, alignItems: "center" },
-  addButtonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
-  playerItem: { flexDirection: "row", justifyContent: "space-between", padding: 12, borderRadius: 8, backgroundColor: "#fff", marginBottom: 8, alignItems: "center" },
-  playerName: { fontSize: 16 },
-  deleteButton: { backgroundColor: "#e53935", paddingHorizontal: 10, paddingVertical: 5, borderRadius: 6 },
-  deleteText: { color: "#fff", fontWeight: "600" },
+
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc", 
+    borderRadius: 8,
+    padding: 10,
+    backgroundColor: "#fff",
+    marginBottom: 10 },
+  addButton: {
+    backgroundColor: currentColors.primary, 
+    padding: 12, 
+    borderRadius: 8, 
+    alignItems: "center" },
+  addButtonText: { 
+    color: "#fff", 
+    fontSize: 16, 
+    fontWeight: "600" },
+  playerItem: { 
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    padding: 12, 
+    borderRadius: 8, 
+    backgroundColor: "#fff", 
+    marginBottom: 8, 
+    alignItems: "center" },
+  playerName: { 
+    fontSize: 16 },
+  editedButton: { 
+    backgroundColor: currentColors.secondary, 
+    paddingHorizontal: 10, 
+    paddingVertical: 5, 
+    borderRadius: 6 ,
+    marginRight: 5},
+  deleteButton: { 
+    backgroundColor: currentColors.danger, 
+    paddingHorizontal: 10, 
+    paddingVertical: 5, 
+    borderRadius: 6 },
+  deleteText: { 
+    color: "#fff", 
+    fontWeight: "600" },
 });

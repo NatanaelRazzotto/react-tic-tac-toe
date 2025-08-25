@@ -7,23 +7,23 @@ import { User } from "../models/user";
 import apiClient from "./apiClient";
 
 export async function getUsers(): Promise<User[]> {
-  const response = await apiClient.get<User[]>("/users");
+  const response = await apiClient.get<User[]>("/user");
   console.log(response)
   return response.data;
 }
 
 export async function getUserById(id: number): Promise<User> {
-  const response = await apiClient.get<User>(`/users/${id}`);
+  const response = await apiClient.get<User>(`/user/${id}`);
   return response.data;
 }
 
 export async function createUser(user: Omit<User, "id">): Promise<string> {
-  const response = await apiClient.post<string>("/users", user);
+  const response = await apiClient.post<string>("/user", user);
   return response.data;
 }
 
 export async function updateUser(userId : string , user: Omit<User, "id">): Promise<string> {
-  const response = await apiClient.put<string>("/users/" +userId, user);
+  const response = await apiClient.put<string>("/user/" +userId, user);
   return response.data;
 }
 

@@ -90,7 +90,7 @@ export default function InitialGameMatchScreen({navigation } : PropsRoute){
         </TouchableOpacity>
 
         <TouchableOpacity 
-            style={[styles.button,  { backgroundColor: gameMatch?.firstPlayer && gameMatch?.secondPlayer  ?  '#2196F3' : '#ccc' }]} 
+            style={[styles.button,  { backgroundColor: gameMatch?.firstPlayer && gameMatch?.secondPlayer  ?  currentColors.primary : currentColors.primary }]} 
             onPress={() => handleSelectStart()}
             disabled={gameMatch?.firstPlayer && gameMatch?.secondPlayer ? false : true} 
         >
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: currentColors.background,
     padding: 20,
   },
   title: {
